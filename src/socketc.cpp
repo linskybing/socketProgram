@@ -34,10 +34,11 @@ void ClientSocket::handleResponse(void* arg) {
     int byte_recv = 0;
     ResponseData data;
     while ((byte_recv = recv(clientSocket, (char*)& data, sizeof(ResponseData), 0)) > 0) {
+        cout << "[INFO] receive response Type: " << data.type << " size: " << data.size << endl;
         // close socket
         if (data.type == CLOSE_SOCKET)
             break;
-
+            
         // handle request
         switch (data.type) {
             case LOBBY:
@@ -47,22 +48,30 @@ void ClientSocket::handleResponse(void* arg) {
                 ClientSocket::handleRoomCreate(clientSocket, data.size);
                 break;
             case JOINROOM:
+                ClientSocket::handleRoomJoin(data.uid, data.size);
                 break;
             case DELETEROOM:
-                ClientSocket::handleRoomDelete(clientSocket, data.size);
+                ClientSocket::handleRoomDelete(data.size);
+                break;
+            case LEAVEROOM:
+                ClientSocket::handleRoomLeave(data.uid, data.size);
                 break;
             case GAMESYNC:
                 break;
         }
+        gameLobby.printLobby();
     }
 }
 
 void ClientSocket::handleLobbyEvent(SOCKET clientSocket, int size) {
     if (size) {
-        Room* roomdata = new Room[size];
-        recv(clientSocket, (char*)& roomdata, sizeof(Room) * size, 0);
         for (int i = 0; i < size; i++) {
-            gameLobby.push(roomdata[i].id, roomdata[i]);
+            Room data;
+            recv(clientSocket, (char*)& data, sizeof(Room), 0);
+            if (strcmp(data.uid[0], auth_uid) == 0) {
+                GameManager::enterExistRoom(data.id);
+            }        
+            gameLobby.push(data.id, data);
         }
     }
 }
@@ -71,23 +80,53 @@ void ClientSocket::handleRoomCreate(SOCKET clientSocket, int size) {
     if (size) {
         Room roomdata;
         recv(clientSocket, (char*)& roomdata, sizeof(Room) * size, 0);
-        gameLobby.push(roomdata.id, roomdata);
-        gameLobby.printLobby();
+        if (strcmp(roomdata.uid[0], auth_uid) == 0)
+            GameManager::enterExistRoom(roomdata.id);
+        gameLobby.push(roomdata.id, roomdata);  
     }
 }
 
-void ClientSocket::handleRoomDelete(SOCKET clientSocket, int id) {
+void ClientSocket::handleRoomDelete(int id) {
     gameLobby.erase(id);
-    cout << "[INFO] ROOM DELETE" << endl;
+    cout << "[INFO] Room " << id << " DELETE" << endl;
+}
+
+void ClientSocket::handleRoomJoin(char* uid, int id) {
+    if (strcmp(uid, auth_uid) == 0) {
+        GameManager::enterExistRoom(id);
+    }
+    
+    strcpy(gameLobby.rooms[id].uid[1], uid);
+    gameLobby.rooms[id].players++;
+}
+
+void ClientSocket::handleRoomLeave(char* uid, int id) {
+    if (strcmp(uid, auth_uid) == 0) {
+        cout << "[INFO] Leave room " << id << endl;
+        GameManager::currentRoom = -1;
+    }
+
+    gameLobby.rooms[id].players--;
+    
+    if (!gameLobby.rooms[id].players) {
+        ClientSocket::handleRoomDelete(id);
+        return;
+    }
+
+    if (strcmp(gameLobby.rooms[id].uid[0], uid) == 0) {
+        swap(gameLobby.rooms[id].uid[0], gameLobby.rooms[id].uid[1]);
+    }
+
 }
 
 void ClientSocket::sendRequest(char uid[UID_LENGTH], RequestType type, int roomId = -1) {
+    cout << "[INFO] send Request Type: " << type << endl;
     RequestData data = {type, ""};
     strcpy(data.uid, uid);
 
     if (roomId != -1)
         data.roomid = roomId;
-        
+    
     send(ClientSocket::clientSocket, (char*) &data, sizeof(data), 0);
 }
 
@@ -102,3 +141,11 @@ void ClientSocket::stopThread() {
         ClientSocket::clear();
     }
 }
+
+
+void GameManager::enterExistRoom(int id) {
+    cout << "[INFO] Enter room " << id << endl;
+    GameManager::currentRoom = id;
+}
+
+

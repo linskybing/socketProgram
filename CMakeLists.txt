@@ -8,3 +8,5 @@ set(CONFIGURATION_SUFFIX "$<LOWER_CASE:$<CONFIGURATION>>")
 add_executable(socket_test
         client.cpp
 )
+
+target_link_libraries(socket_test ws2_32)

@@ -115,6 +115,7 @@
     "__config": "cpp",
     "charconv": "cpp",
     "forward_list": "cpp",
-    "sstream": "cpp"
+    "sstream": "cpp",
+    "type_traits": "cpp"
   },
 }

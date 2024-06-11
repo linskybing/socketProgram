@@ -21,6 +21,7 @@ namespace GameSocket {
     pthread_t mainThread;
 
     std::map<int, std::string> clientSockets;
+    std::map<std::string, int> clientSockets_r;
 
     void init();
     void* start(void*);
@@ -30,8 +31,10 @@ namespace GameSocket {
     void* handleClient(void*);
     void handleLobbyEvent(int, char[UID_LENGTH]);
 
-    void handleRoomCreate(int);
-    void handleDeleteRoom(int);
+    void handleRoomCreate(char*, char*);
+    void handleRoomDelete(int);
+    void handleRoomJoin(char*, int);
+    void handleRoomLeave(char*, int);
 
     // clear function
     void disconnetion(int socket);
