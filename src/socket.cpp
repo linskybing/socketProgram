@@ -11,6 +11,7 @@ void GameSocket::init() {
     serverAddress.sin_addr.s_addr = INADDR_ANY;
     bind(GameSocket::serverSocket, (struct sockaddr *)&serverAddress, sizeof(serverAddress));
     listen(GameSocket::serverSocket, 5);
+    cout << "server listen ... \n";
     pthread_create(&GameSocket::mainThread, nullptr, &GameSocket::start, nullptr);
 }
 
