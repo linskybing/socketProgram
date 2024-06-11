@@ -8,7 +8,7 @@
 
 #pragma comment(lib, "ws2_32.lib")
 
-const char* host = "174.138.95.110";
+const char* host = "192.168.56.1";
 
 Lobby gameLobby;
 char auth_uid[UID_LENGTH];
