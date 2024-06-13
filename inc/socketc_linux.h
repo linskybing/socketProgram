@@ -8,6 +8,7 @@
 #include <pthread.h>
 #include <cstring>
 #include "data.h"
+#include "database_client.h"
 
 
 const char* host = "127.0.0.1";

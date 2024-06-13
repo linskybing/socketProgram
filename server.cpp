@@ -5,6 +5,7 @@
 
 int main()
 {
+    DB::readUsersData();
     GameSocket::init();
     GameSocket::clear();
     return 0;

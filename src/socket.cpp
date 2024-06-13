@@ -38,9 +38,32 @@ void* GameSocket::handleClient(void* arg) {
         // close socket
         if (data.type == CLOSE_SOCKET)
             break;
-        
+
+        ResponseData datar;
         // handle request
         switch (data.type) {
+            case LOGIN:
+                if (DB::login(data.uid, data.pwd)) {
+                    datar.type = LOGIN;
+                    datar.flag = true;
+                }
+                else {
+                    datar.type = LOGIN;
+                    datar.flag = false;
+                }
+                send((clientSocket), (char*) &datar, sizeof(ResponseData), 0);
+                break;
+            case REGISTER:
+                if (!DB::login(data.uid, data.pwd)) {
+                    datar.type = REGISTER;
+                    datar.flag = true;
+                }
+                else {
+                    datar.type = REGISTER;
+                    datar.flag = false;
+                }
+                send((clientSocket), (char*) &datar, sizeof(ResponseData), 0);
+                break;
             case LOBBY:
                 GameSocket::handleLobbyEvent(clientSocket, data.uid);
                 break;
@@ -67,6 +90,7 @@ void* GameSocket::handleClient(void* arg) {
     pthread_exit(nullptr);
     return nullptr;
 }
+
 
 void GameSocket::handleLobbyEvent(int clientSocket, char uid[UID_LENGTH]) {
 

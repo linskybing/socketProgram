@@ -5,10 +5,10 @@
 #include <winsock2.h>
 #include <ws2tcpip.h>
 #include "data.h"
-
+#include "database_client.h"
 #pragma comment(lib, "ws2_32.lib")
 
-const char* host = "192.168.56.1";
+const char* host = "127.0.0.1";
 
 Lobby gameLobby;
 char auth_uid[UID_LENGTH];

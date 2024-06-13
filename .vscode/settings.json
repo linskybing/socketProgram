@@ -116,6 +116,8 @@
     "charconv": "cpp",
     "forward_list": "cpp",
     "sstream": "cpp",
-    "type_traits": "cpp"
+    "type_traits": "cpp",
+    "fstream": "cpp",
+    "iomanip": "cpp"
   },
 }

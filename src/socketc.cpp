@@ -41,6 +41,18 @@ void ClientSocket::handleResponse(void* arg) {
             
         // handle request
         switch (data.type) {
+            case LOGIN:
+                if (data.flag) {
+                    Auth::writeCookie(Auth::userName, Auth::password);
+                }
+                else cout << "userName or Password incorrect !!" << endl;
+                break;
+            case REGISTER:
+                if (data.flag) {
+                    Auth::writeCookie(Auth::userName, Auth::password);
+                }
+                else cout << "FAIL" << endl;
+                break;
             case LOBBY:
                 ClientSocket::handleLobbyEvent(clientSocket, data.size);
                 break;
@@ -121,7 +133,8 @@ void ClientSocket::handleRoomLeave(char* uid, int id) {
 
 void ClientSocket::sendRequest(char uid[UID_LENGTH], RequestType type, int roomId = -1) {
     cout << "[INFO] send Request Type: " << type << endl;
-    RequestData data = {type, ""};
+    RequestData data;
+    data.type = type;
     strcpy(data.uid, uid);
 
     if (roomId != -1)
@@ -148,4 +161,19 @@ void GameManager::enterExistRoom(int id) {
     GameManager::currentRoom = id;
 }
 
+void loginToLobby(char* name, char* pwd) {
+    RequestData data;
+    data.type = LOGIN;
+    strcpy(data.uid, name);
 
+    send(ClientSocket::clientSocket, (char*) &data, sizeof(RequestData), 0);
+}
+
+
+void registerAccount(char* name, char* pwd) {
+    RequestData data;
+    data.type = REGISTER;
+    strcpy(data.uid, name);
+
+    send(ClientSocket::clientSocket, (char*) &data, sizeof(RequestData), 0);
+}

@@ -5,15 +5,27 @@ using namespace std;
 int main() {
     ClientSocket::init();
 
-    cin >> auth_uid;
-    ClientSocket::sendRequest(auth_uid, LOBBY);
     int request;
     int id;
-    cout << "enter request code: ";
     while (cin >> request) {
         if (request == -1) break;
         if (request == LEAVEROOM) {
             ClientSocket::sendRequest(auth_uid, (RequestType) request, GameManager::currentRoom);
+        }
+        else if (request == LOBBY) {
+            ClientSocket::sendRequest(auth_uid, LOBBY);
+        }
+        else if (request == LOGIN) {
+            char name[UID_LENGTH];
+            char pwd[UID_LENGTH];
+            cin >> name >> pwd;
+            loginToLobby(name, pwd);
+        }
+        else if (request == REGISTER) {
+            char name[UID_LENGTH];
+            char pwd[UID_LENGTH];
+            cin >> name >> pwd;
+            registerAccount(name, pwd);
         }
         else if (request == JOINROOM) {
             cout << "enter room id: ";
@@ -23,8 +35,8 @@ int main() {
         else {
             ClientSocket::sendRequest(auth_uid, (RequestType) request);
         }
-        cout << "enter request code: ";
     }
     ClientSocket::stopThread();
+
     return 0;
 }
