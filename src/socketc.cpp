@@ -136,7 +136,7 @@ void ClientSocket::sendRequest(char uid[UID_LENGTH], RequestType type, int roomI
     cout << "[INFO] send Request Type: " << type << endl;
     RequestData data;
     data.type = type;
-    strcpy(data.uid, uid);
+    strcpy(data.uid, Auth::userName);
 
     if (roomId != -1)
         data.roomid = roomId;
