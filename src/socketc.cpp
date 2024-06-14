@@ -93,7 +93,7 @@ void ClientSocket::handleRoomCreate(SOCKET clientSocket, int size) {
     if (size) {
         Room roomdata;
         recv(clientSocket, (char*)& roomdata, sizeof(Room) * size, 0);
-        if (strcmp(roomdata.uid[0], auth_uid) == 0)
+        if (strcmp(roomdata.uid[0], Auth::userName) == 0)
             GameManager::enterExistRoom(roomdata.id);
         gameLobby.push(roomdata.id, roomdata);  
     }
@@ -105,7 +105,7 @@ void ClientSocket::handleRoomDelete(int id) {
 }
 
 void ClientSocket::handleRoomJoin(char* uid, int id) {
-    if (strcmp(uid, auth_uid) == 0) {
+    if (strcmp(uid, Auth::userName) == 0) {
         GameManager::enterExistRoom(id);
     }
     
