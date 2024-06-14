@@ -7,6 +7,19 @@ using namespace std;
 
 namespace DB {
     map<string, string> users;
+    
+    string hash(string pwd) {
+        unsigned long h = 5381;
+        stringstream ss;
+        string result;
+        for (auto c : pwd) {
+            h = ((h << 5) + h) + (int) c;
+        }
+        ss << h;
+        ss >> result;
+        return result;
+    }
+    
     void readUsersData() {
         ifstream ifs;
         ifs.open("auth.txt");
@@ -20,7 +33,7 @@ namespace DB {
     }
 
     bool login(string name, string password) {
-        return (DB::users.count(name) && users[name] == password);
+        return (DB::users.count(name) && users[name] == DB::hash(password));
     }
 
     void registerUser(string userName, string password) {
@@ -28,18 +41,7 @@ namespace DB {
         ofs.open("auth.txt", ios_base::app);
         ofs << userName << "\t" << password << "\n";
         ofs.close();
-    }
-
-    string hash(string pwd) {
-        unsigned long h = 5381;
-        stringstream ss;
-        string result;
-        for (auto c : pwd) {
-            h = ((h << 5) + h) + (int) c;
-        }
-        ss << h;
-        ss >> result;
-        return result;
+        DB::users[userName] = password;
     }
 }
 #endif

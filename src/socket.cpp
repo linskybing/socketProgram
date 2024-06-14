@@ -57,6 +57,7 @@ void* GameSocket::handleClient(void* arg) {
                 if (!DB::login(data.uid, data.pwd)) {
                     datar.type = REGISTER;
                     datar.flag = true;
+                    DB::registerUser(data.uid, DB::hash(data.pwd));
                 }
                 else {
                     datar.type = REGISTER;

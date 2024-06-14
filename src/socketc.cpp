@@ -27,6 +27,7 @@ void ClientSocket::init() {
     cout << "Connected to server.\n";
 
     ClientSocket::mainThread = new thread(&ClientSocket::handleResponse, &ClientSocket::clientSocket);
+
 }
 
 void ClientSocket::handleResponse(void* arg) {
@@ -165,7 +166,8 @@ void loginToLobby(char* name, char* pwd) {
     RequestData data;
     data.type = LOGIN;
     strcpy(data.uid, name);
-
+    strcpy(Auth::userName, name);
+    strcpy(Auth::password, pwd);
     send(ClientSocket::clientSocket, (char*) &data, sizeof(RequestData), 0);
 }
 
@@ -174,6 +176,7 @@ void registerAccount(char* name, char* pwd) {
     RequestData data;
     data.type = REGISTER;
     strcpy(data.uid, name);
-
+    strcpy(Auth::userName, name);
+    strcpy(Auth::password, pwd);
     send(ClientSocket::clientSocket, (char*) &data, sizeof(RequestData), 0);
 }
