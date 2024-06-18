@@ -26,6 +26,7 @@ map<AuthState, string> authToStr = {
 void GameSocket::init() {
     GameSocket:serverSocket = socket(AF_INET, SOCK_STREAM, 0);
     int status;
+    int on = 1;
     if (GameSocket::serverSocket == -1) {
         perror("Socket creation error");
         exit(1);
