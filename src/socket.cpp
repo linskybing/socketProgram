@@ -57,6 +57,7 @@ void* GameSocket::handleClient(void* arg) {
         cout << "[INFO] Reuqest " << data.uid << " Type: " << typeToStr[data.type] << endl;
         ResponseData datar;
         // handle request
+        cout << data.uid << " " << data.pwd << " " << DB::hash(data.pwd) << " " << DB::users[data.uid] << endl;
         switch (data.type) {
             case LOGIN:
                 if (DB::login(data.uid, DB::hash(data.pwd))) {
