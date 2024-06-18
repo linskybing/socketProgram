@@ -6,7 +6,7 @@
 #include <unistd.h>
 #include <pthread.h>
 #include "data.h"
-
+#include "database_server.h"
 #define PORT 8080
 
 #define PARALLEL 5

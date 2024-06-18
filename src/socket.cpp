@@ -3,6 +3,26 @@
 #include <cstring>
 using namespace std;
 
+map<RequestType, string> typeToStr = {
+    {LOGIN, "LOGIN"},
+    {REGISTER, "REGISTER"},
+    {LOBBY, "LOBBY"},
+    {CREATEROOM, "CREATEROOM"},
+    {JOINROOM, "JOINROOM"},
+    {LEAVEROOM, "LEAVEROOM"},
+    {DELETEROOM, "DELETEROOM"},
+    {GAMESYNC, "GAMESYNC"},
+    {REJECT, "REJECT"},
+    {CLOSE_SOCKET, "CLOSE_SOCKET"}
+};
+
+map<AuthState, string> authToStr = {
+    {SUCCESS, "SUCCESS"},
+    {FALE, "FALE"}, 
+    {EXIST, "EXIST"},
+    {WAIT, "WAIT"}
+};
+
 void GameSocket::init() {
     GameSocket:serverSocket = socket(AF_INET, SOCK_STREAM, 0);
     sockaddr_in serverAddress;
@@ -34,13 +54,33 @@ void* GameSocket::handleClient(void* arg) {
     int byte_recv = 0;
     RequestData data;
     while ((byte_recv = recv(clientSocket, &data, sizeof(RequestData), 0)) > 0) {
-        cout << "[INFO] Reuqest " << data.uid << " Type: " << data.type << endl;
-        // close socket
-        if (data.type == CLOSE_SOCKET)
-            break;
-        
+        cout << "[INFO] Reuqest " << data.uid << " Type: " << typeToStr[data.type] << endl;
+        ResponseData datar;
         // handle request
         switch (data.type) {
+            case LOGIN:
+                if (DB::login(data.uid, DB::hash(data.pwd))) {
+                    datar.type = LOGIN;
+                    datar.auth = SUCCESS;
+                }
+                else {
+                    datar.type = LOGIN;
+                    datar.auth = FALE;
+                }
+                send((clientSocket), (char*) &datar, sizeof(ResponseData), 0);
+                break;
+            case REGISTER:
+                if (!DB::login(data.uid, data.pwd)) {
+                    datar.type = REGISTER;
+                    datar.auth = SUCCESS;
+                    DB::registerUser(data.uid, DB::hash(data.pwd));
+                }
+                else {
+                    datar.type = REGISTER;
+                    datar.auth = EXIST;
+                }
+                send((clientSocket), (char*) &datar, sizeof(ResponseData), 0);
+                break;
             case LOBBY:
                 GameSocket::handleLobbyEvent(clientSocket, data.uid);
                 break;
@@ -56,6 +96,8 @@ void* GameSocket::handleClient(void* arg) {
             case LEAVEROOM:
                 GameSocket::handleRoomLeave(data.uid, data.roomid);
                 break;
+            case CLOSE_SOCKET:
+                break;
             case GAMESYNC:
                 break;
         }
@@ -68,6 +110,7 @@ void* GameSocket::handleClient(void* arg) {
     return nullptr;
 }
 
+
 void GameSocket::handleLobbyEvent(int clientSocket, char uid[UID_LENGTH]) {
 
     cout << "[Lobby] " << uid << " enter lobby" << endl;
@@ -76,8 +119,9 @@ void GameSocket::handleLobbyEvent(int clientSocket, char uid[UID_LENGTH]) {
     GameSocket::pushSocket(clientSocket, s);
 
     // send lobby information to user
-    ResponseData data = {LOBBY, gameLobby.size};
-
+    ResponseData data;
+    data.type = LOBBY;
+    data.size = gameLobby.size;
     send(clientSocket, (char*) &data, sizeof(ResponseData), 0);
     
     for (auto it: gameLobby.rooms) {
@@ -108,8 +152,9 @@ void GameSocket::handleRoomCreate(char* uid, char* roomName) {
     strcpy(nRoom.uid[nRoom.players++], uid);
     gameLobby.push(nRoom.id, nRoom);
 
-    ResponseData data = {CREATEROOM, 1};
-
+    ResponseData data;
+    data.type = CREATEROOM;
+    data.size = 1;
     for (auto it: GameSocket::clientSockets) {
         send((it.first), (char*) &data, sizeof(ResponseData), 0);
         send((it.first), (char*) &nRoom, sizeof(Room), 0);
@@ -118,8 +163,9 @@ void GameSocket::handleRoomCreate(char* uid, char* roomName) {
 
 void GameSocket::handleRoomDelete(int id) {
     gameLobby.erase(id);
-    ResponseData data = {DELETEROOM, id};
-
+    ResponseData data;
+    data.type = DELETEROOM;
+    data.size = id;
     for (auto it: GameSocket::clientSockets) {
         send((it.first), (char*) &data, sizeof(ResponseData), 0);
     }
@@ -132,7 +178,9 @@ void GameSocket::handleRoomJoin(char* uid, int id) {
     strcpy(gameLobby.rooms[id].uid[1], uid);
     gameLobby.rooms[id].players++;
 
-    ResponseData data = {JOINROOM, id};
+    ResponseData data;
+    data.type = JOINROOM;
+    data.size = id;
     strcpy(data.uid, uid);
     for (auto it: GameSocket::clientSockets) {
         send((it.first), (char*) &data, sizeof(ResponseData), 0);
@@ -152,7 +200,9 @@ void GameSocket::handleRoomLeave(char* uid, int id) {
         swap(gameLobby.rooms[id].uid[0], gameLobby.rooms[id].uid[1]);
     }
 
-    ResponseData data = {LEAVEROOM, id};
+    ResponseData data;
+    data.type = LEAVEROOM;
+    data.size = id;
     strcpy(data.uid, uid);
     for (auto it: GameSocket::clientSockets) {
         send((it.first), (char*) &data, sizeof(ResponseData), 0);

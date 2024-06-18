@@ -10,18 +10,20 @@
 #define PLAYERS 2
 using namespace std;
 
-enum RequestType { LOBBY, CREATEROOM, JOINROOM, LEAVEROOM, DELETEROOM, GAMESYNC, REJECT, CLOSE_SOCKET };
-
+enum RequestType { LOGIN, REGISTER, LOBBY, CREATEROOM, JOINROOM, LEAVEROOM, DELETEROOM, GAMESYNC, REJECT, CLOSE_SOCKET };
+enum AuthState { SUCCESS, FALE, EXIST, WAIT };
 struct RequestData {
     RequestType type;
     char uid[UID_LENGTH];
+    char pwd[UID_LENGTH];
     int roomid = -1;
 };
 
 struct ResponseData {
+    int size = 0;
     RequestType type;
-    int size;
     char uid[UID_LENGTH];
+    AuthState auth;
 };
 
 struct Room {
