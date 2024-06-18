@@ -32,16 +32,16 @@ namespace DB {
         ifs.close();
     }
 
-    bool login(string name, string password) {
-        return (DB::users.count(name) && users[name] == DB::hash(password));
+    bool login(char name[UID_LENGTH], string password) {
+        return (DB::users.count(name) && DB::users[name] == password);
     }
 
     void registerUser(string userName, string password) {
+        DB::users[userName] = password;
         ofstream ofs;
         ofs.open("auth.txt", ios_base::app);
         ofs << userName << "\t" << password << "\n";
         ofs.close();
-        DB::users[userName] = password;
     }
 }
 #endif
