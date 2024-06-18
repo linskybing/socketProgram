@@ -26,13 +26,13 @@ map<AuthState, string> authToStr = {
 void GameSocket::init() {
     GameSocket:serverSocket = socket(AF_INET, SOCK_STREAM, 0);
     int status;
-    if (GameSocket:serverSocket == -1) {
+    if (GameSocket::serverSocket == -1) {
         perror("Socket creation error");
         exit(1);
     }
 
 
-    if (setsockopt(GameSocket:serverSocket, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(int)) == -1) {
+    if (setsockopt(GameSocket::serverSocket, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(int)) == -1) {
         perror("Setsockopt error");
         exit(1);
     }
@@ -53,7 +53,7 @@ void GameSocket::init() {
         perror("Listening error");
         exit(1);
     }
-    
+
     cout << "server listen ... \n";
     pthread_create(&GameSocket::mainThread, nullptr, &GameSocket::start, nullptr);
 }
