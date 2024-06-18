@@ -94,7 +94,7 @@ void* GameSocket::handleClient(void* arg) {
                 send((clientSocket), (char*) &datar, sizeof(ResponseData), 0);
                 break;
             case REGISTER:
-                if (!DB::login(data.uid, data.pwd)) {
+                if (!DB::users.count(data.uid)) {
                     datar.type = REGISTER;
                     datar.auth = SUCCESS;
                     DB::registerUser(data.uid, DB::hash(data.pwd));
