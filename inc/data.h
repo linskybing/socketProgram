@@ -11,7 +11,7 @@
 using namespace std;
 
 enum RequestType { LOGIN, REGISTER, LOBBY, CREATEROOM, JOINROOM, LEAVEROOM, DELETEROOM, GAMESYNC, REJECT, CLOSE_SOCKET };
-
+enum AuthState { SUCCESS, FALE, EXIST }
 struct RequestData {
     RequestType type;
     char uid[UID_LENGTH];
@@ -20,10 +20,10 @@ struct RequestData {
 };
 
 struct ResponseData {
-    RequestType type;
     int size = 0;
+    RequestType type;
     char uid[UID_LENGTH];
-    bool flag;
+    AuthState auth;
 };
 
 struct Room {

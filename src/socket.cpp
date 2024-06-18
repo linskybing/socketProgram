@@ -35,33 +35,29 @@ void* GameSocket::handleClient(void* arg) {
     RequestData data;
     while ((byte_recv = recv(clientSocket, &data, sizeof(RequestData), 0)) > 0) {
         cout << "[INFO] Reuqest " << data.uid << " Type: " << data.type << endl;
-        // close socket
-        if (data.type == CLOSE_SOCKET)
-            break;
-
         ResponseData datar;
         // handle request
         switch (data.type) {
             case LOGIN:
                 if (DB::login(data.uid, data.pwd)) {
                     datar.type = LOGIN;
-                    datar.flag = true;
+                    datar.auth = SUCCESS;
                 }
                 else {
                     datar.type = LOGIN;
-                    datar.flag = false;
+                    datar.auth = FALE;
                 }
                 send((clientSocket), (char*) &datar, sizeof(ResponseData), 0);
                 break;
             case REGISTER:
                 if (!DB::login(data.uid, data.pwd)) {
                     datar.type = REGISTER;
-                    datar.flag = true;
+                    datar.auth = SUCCESS;
                     DB::registerUser(data.uid, DB::hash(data.pwd));
                 }
                 else {
                     datar.type = REGISTER;
-                    datar.flag = false;
+                    datar.auth = EXIST;
                 }
                 send((clientSocket), (char*) &datar, sizeof(ResponseData), 0);
                 break;
@@ -79,6 +75,8 @@ void* GameSocket::handleClient(void* arg) {
                 break;
             case LEAVEROOM:
                 GameSocket::handleRoomLeave(data.uid, data.roomid);
+                break;
+            case CLOSE_SOCKET:
                 break;
             case GAMESYNC:
                 break;
