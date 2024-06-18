@@ -15,6 +15,7 @@ void ClientSocket::init() {
     server_name.sin_port = htons(PORT);
 
     if (connect(ClientSocket::clientSocket, (sockaddr *)&server_name, sizeof(server_name)) == -1) {
+        cout << "Connect fail...." << endl;
         return;
     }
 

@@ -10,7 +10,7 @@
 #include "data.h"
 
 
-const char* host = "127.0.0.1";
+const char* host = "174.138.95.110";
 
 Lobby gameLobby;
 char auth_uid[UID_LENGTH];
