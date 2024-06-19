@@ -7,7 +7,8 @@
     "ostream": "cpp",
     "system_error": "cpp",
     "xlocale": "cpp",
-    "typeinfo": "cpp"
+    "typeinfo": "cpp",
+    "bitset": "cpp"
   },
   "C_Cpp_Runner.cCompilerPath": "gcc",
   "C_Cpp_Runner.cppCompilerPath": "g++",

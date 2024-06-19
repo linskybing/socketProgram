@@ -109,7 +109,7 @@ void* GameSocket::handleClient(void* arg) {
                 GameSocket::handleLobbyEvent(clientSocket, data.uid);
                 break;
             case CREATEROOM:
-                GameSocket::handleRoomCreate(data.uid, "test");
+                GameSocket::handleRoomCreate(data.uid, data.uid);
                 break;
             case DELETEROOM:
                 GameSocket::handleRoomDelete(data.roomid);
