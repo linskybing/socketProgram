@@ -34,8 +34,8 @@ namespace GameSocket {
     void handleRoomCreate(char*, char*);
     void handleRoomDelete(int);
     void handleRoomJoin(char*, int);
-    void handleRoomLeave(char*, int);
-
+    void handleRoomLeave(const char*, int);
+    void handleGameSync(RequestData data);
     // clear function
     void disconnetion(int socket);
     void clear();

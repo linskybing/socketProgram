@@ -123,6 +123,7 @@ void* GameSocket::handleClient(void* arg) {
             case CLOSE_SOCKET:
                 break;
             case GAMESYNC:
+                GameSocket::handleGameSync(data);
                 break;
         }
         gameLobby.printLobby();
@@ -160,8 +161,11 @@ void GameSocket::pushSocket(int p, string uid) {
 
 void GameSocket::disconnetion(int socket) {
     cout << "[INFO] " << clientSockets[socket] << " Disconnetion" << endl;
-    clientSockets_r.erase(clientSockets[socket]);
+    string userName(clientSockets[socket]);
+    clientSockets_r.erase(userName);
     clientSockets.erase(socket);
+    if (gameLobby.userToRoom.count(userName))
+        GameSocket::handleRoomLeave(userName.c_str(), gameLobby.userToRoom[userName]);
 }
 
 void GameSocket::clear() {
@@ -171,10 +175,15 @@ void GameSocket::clear() {
 
 void GameSocket::handleRoomCreate(char* uid, char* roomName) {
 
-    Room nRoom = {gameLobby.size, "", ""};
+    Room nRoom;
+    if (gameLobby.size)
+        nRoom.id = (gameLobby.rooms.rbegin()->first) + 1;
+    else
+        nRoom.id = 0;
     strcpy(nRoom.roomName, roomName);
     strcpy(nRoom.uid[nRoom.players++], uid);
     gameLobby.push(nRoom.id, nRoom);
+    gameLobby.userToRoom[string(uid)] = nRoom.id;
 
     ResponseData data;
     data.type = CREATEROOM;
@@ -201,7 +210,7 @@ void GameSocket::handleRoomJoin(char* uid, int id) {
     if (id == -1 || gameLobby.rooms[id].players > 1) return;
     strcpy(gameLobby.rooms[id].uid[1], uid);
     gameLobby.rooms[id].players++;
-
+    gameLobby.userToRoom[string(uid)] = id;
     ResponseData data;
     data.type = JOINROOM;
     data.size = id;
@@ -211,9 +220,9 @@ void GameSocket::handleRoomJoin(char* uid, int id) {
     }
 }
 
-void GameSocket::handleRoomLeave(char* uid, int id) {
+void GameSocket::handleRoomLeave(const char* uid, int id) {
     if (id == -1) return;
-
+    gameLobby.userToRoom.erase(string(uid));
     gameLobby.rooms[id].players--;
     if (!gameLobby.rooms[id].players) {
         GameSocket::handleRoomDelete(id);
@@ -230,5 +239,27 @@ void GameSocket::handleRoomLeave(char* uid, int id) {
     strcpy(data.uid, uid);
     for (auto it: GameSocket::clientSockets) {
         send((it.first), (char*) &data, sizeof(ResponseData), 0);
+    }
+}
+
+void printData(RequestData data) {
+    cout << "TYPE: " << typeToStr[data.type] << endl;
+    cout << "ROOMID: " << data.roomid << endl;
+    cout << "GAMETYPE " << data.gameData.type << endl;
+}
+
+void GameSocket::handleGameSync(RequestData data) {
+    if (data.roomid == -1 || !gameLobby.rooms.count(data.roomid))
+        return;
+    int id = data.roomid;
+    auto gData = gameLobby.rooms[id];
+    ResponseData rdata;
+    strcpy(rdata.uid, data.uid);
+    rdata.roomid = data.roomid;
+    rdata.type = GAMESYNC;
+    rdata.gameData = data.gameData;
+    for (int i = 0; i < gData.players; i++) {
+        int target = clientSockets_r[gData.uid[i]];
+        send(target, (char*) &rdata, sizeof(ResponseData), 0);
     }
 }

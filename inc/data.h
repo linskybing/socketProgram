@@ -4,6 +4,7 @@
 #include <vector>
 #include <map>
 #include <string>
+#include <queue>
 #include <iostream>
 #define UID_LENGTH 100
 #define ROOMNAME_LENGTH 30
@@ -12,18 +13,31 @@ using namespace std;
 
 enum RequestType { LOGIN, REGISTER, LOBBY, CREATEROOM, JOINROOM, LEAVEROOM, DELETEROOM, GAMESYNC, REJECT, CLOSE_SOCKET };
 enum AuthState { SUCCESS, FALE, EXIST, WAIT };
+enum CallBackType { START, ROOMLIST, ROOM, GAME };
+enum GameSyncType { FREEZE, METEOR, BARREL, SHOVEL, LEVELUP, TOWER };
+extern map<RequestType, string> typeToStr;
+extern map<AuthState, string> authToStr;
+
+struct GameSync {
+    GameSyncType type;
+    float x;
+    float y;
+};
 struct RequestData {
     RequestType type;
     char uid[UID_LENGTH];
     char pwd[UID_LENGTH];
     int roomid = -1;
+    GameSync gameData;
 };
 
 struct ResponseData {
     int size = 0;
-    RequestType type;
+    int roomid = -1;
     char uid[UID_LENGTH];
-    AuthState auth;
+    RequestType type;
+    AuthState auth;    
+    GameSync gameData;
 };
 
 struct Room {
@@ -33,10 +47,15 @@ struct Room {
     int players = 0;
 };
 
+struct UserData {
+    int money;
+    int score;
+};
+
 struct Lobby {
     int size = 0;
     std::map<int, Room> rooms;
-
+    std::map<std::string, int> userToRoom;
     void push(int id, Room room) {
         size++;
         rooms[id] = room;
