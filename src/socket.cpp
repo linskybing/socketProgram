@@ -13,7 +13,9 @@ map<RequestType, string> typeToStr = {
     {DELETEROOM, "DELETEROOM"},
     {GAMESYNC, "GAMESYNC"},
     {REJECT, "REJECT"},
-    {CLOSE_SOCKET, "CLOSE_SOCKET"}
+    {CLOSE_SOCKET, "CLOSE_SOCKET"},
+    {LOADGAME, "LOADGAME"},
+    {GAMESTART, "GAMESTART"},
 };
 
 map<AuthState, string> authToStr = {
@@ -122,7 +124,13 @@ void* GameSocket::handleClient(void* arg) {
                 break;
             case CLOSE_SOCKET:
                 break;
-            case GAMESYNC:
+            case GAMESTART:
+                GameSocket::quickSend(data);
+                break;
+            case LOADGAME:
+                GameSocket::handleGameStart(data);
+                break;
+            case GAMESYNC: 
                 GameSocket::handleGameSync(data);
                 break;
         }
@@ -261,5 +269,36 @@ void GameSocket::handleGameSync(RequestData data) {
     for (int i = 0; i < gData.players; i++) {
         int target = clientSockets_r[gData.uid[i]];
         send(target, (char*) &rdata, sizeof(ResponseData), 0);
+    }
+}
+
+void GameSocket::handleGameStart(RequestData data) {
+    if (data.roomid == -1 || !gameLobby.rooms.count(data.roomid))
+        return;
+    int id = data.roomid;
+    auto gData = gameLobby.rooms[id];
+    ResponseData rdata;
+    strcpy(rdata.uid, data.uid);
+    rdata.roomid = data.roomid;
+    rdata.type = LOADGAME;
+    for (int i = 0; i < gData.players; i++) {
+        int target = clientSockets_r[gData.uid[i]];
+        send(target, (char*) &rdata, sizeof(ResponseData), 0);
+    }
+}
+
+void GameSocket::quickSend(RequestData data) {
+    ResponseData rdata;
+    rdata.type = GAMESTART;
+    strcpy(rdata.uid, data.uid);
+    rdata.roomid = data.roomid;
+    auto gData = gameLobby.rooms[data.roomid];
+    for (int i = 0; i < gData.players; i++) {
+        if (!strcmp(gData.uid[i], data.uid)) {
+            int target = clientSockets_r[gData.uid[i]];
+            send(target, (char*) &rdata, sizeof(ResponseData), 0);
+            std::cout << "find\n" << std::endl;
+            return;
+        }
     }
 }

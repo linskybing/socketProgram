@@ -7,7 +7,7 @@
 #include <pthread.h>
 #include "data.h"
 #include "database_server.h"
-#define PORT 8080
+#define PORT 7658
 
 #define PARALLEL 5
 
@@ -36,6 +36,8 @@ namespace GameSocket {
     void handleRoomJoin(char*, int);
     void handleRoomLeave(const char*, int);
     void handleGameSync(RequestData data);
+    void handleGameStart(RequestData data);
+    void quickSend(RequestData data);
     // clear function
     void disconnetion(int socket);
     void clear();
