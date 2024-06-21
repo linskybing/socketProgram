@@ -300,7 +300,6 @@ void GameSocket::quickSend(RequestData data) {
         if (!strcmp(gData.uid[i], data.uid)) {
             int target = clientSockets_r[gData.uid[i]];
             send(target, (char*) &rdata, sizeof(ResponseData), 0);
-            std::cout << "find\n" << std::endl;
             return;
         }
     }
@@ -314,6 +313,7 @@ void GameSocket::handleMapSelect(RequestData data) {
     rdata.roomid = data.roomid;
     rdata.type = SELECT;
     rdata.mapId = data.mapId;
+    std::cout << data.mapId << std::endl;
     for (auto it: GameSocket::clientSockets) {
         send((it.first), (char*) &rdata, sizeof(ResponseData), 0);
     }

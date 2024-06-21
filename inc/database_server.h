@@ -7,7 +7,7 @@ using namespace std;
 
 namespace DB {
     map<string, string> users;
-    
+
     string hash(string pwd) {
         unsigned long h = 5381;
         stringstream ss;
@@ -43,5 +43,7 @@ namespace DB {
         ofs << userName << "\t" << password << "\n";
         ofs.close();
     }
+
+    
 }
 #endif
