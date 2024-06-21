@@ -8,7 +8,7 @@ using namespace std;
 namespace DB {
     map<string, string> users;
     map<string, int> score;
-    map<string, vector<int>> items;
+    map<string, vector<int> > items;
     map<string, int> money;
     string hash(string pwd) {
         unsigned long h = 5381;
@@ -78,8 +78,45 @@ namespace DB {
         ofs.close();
     }
 
-    void writeUserCo
+    void writeUserScore(string userName) {
+        ofstream ofs;
+        ofs.open("score/" + userName + ".txt");
+        ofs << ((DB::score.count(userName))? DB::score[userName]: 0);
+        ofs.close();
+    }
 
+    void writeUserItem(string userName) {
+        ofstream ofs;
+        ofs.open("item/" + userName + ".txt");
+        if (DB::items.count(userName)) {
+            ofs << "0\t0\t0\t";
+        }
+        else {
+            for (int i = 0; i < ITEMS; i++) {
+                ofs << DB::items[userName][i] << "\t";
+            }
+        }
+        ofs.close();
+    }
+
+    void writeUserMoney(string userName) {
+        ofstream ofs;
+        ofs.open("money/" + userName + ".txt");
+        if (DB::money.count(userName)) {
+            ofs << DB::money[userName];
+        }
+        else {
+            ofs << 0 << endl;
+        }
+        ofs.close();
+    }
     
-}
+    void writeUserData() {
+        for (auto it: DB::users) {
+            writeUserItem(it.first);
+            writeUserMoney(it.first);
+            writeUserScore(it.first);
+        }
+    }
+};
 #endif

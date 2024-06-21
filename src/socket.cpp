@@ -43,12 +43,8 @@ void GameSocket::init() {
     serverAddress.sin_family = AF_INET;
     serverAddress.sin_port = htons(PORT);
     serverAddress.sin_addr.s_addr = INADDR_ANY;
-    status = bind(GameSocket::serverSocket, (struct sockaddr *)&serverAddress, sizeof(serverAddress));
+    bind(GameSocket::serverSocket, (struct sockaddr *)&serverAddress, sizeof(serverAddress));
 
-    if (status == -1) {
-        perror("Binding error");
-        exit(1);
-    }
 
     status = listen(GameSocket::serverSocket, 5);
 

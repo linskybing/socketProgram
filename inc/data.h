@@ -9,6 +9,7 @@
 #define UID_LENGTH 100
 #define ROOMNAME_LENGTH 30
 #define PLAYERS 2
+#define ITEMS 3
 using namespace std;
 
 enum RequestType { LOGIN, REGISTER, LOBBY, CREATEROOM, JOINROOM, LEAVEROOM, DELETEROOM, LOADGAME, GAMESTART, GAMESYNC, SELECT, REJECT, CLOSE_SOCKET };
@@ -54,6 +55,7 @@ struct Room {
 struct UserData {
     int money;
     int score;
+    int items[ITEMS];
 };
 
 struct Lobby {
