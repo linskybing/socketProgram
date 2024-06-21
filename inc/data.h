@@ -14,7 +14,7 @@ using namespace std;
 enum RequestType { LOGIN, REGISTER, LOBBY, CREATEROOM, JOINROOM, LEAVEROOM, DELETEROOM, LOADGAME, GAMESTART, GAMESYNC, SELECT, REJECT, CLOSE_SOCKET };
 enum AuthState { SUCCESS, ENTERGAME, FALE, EXIST, WAIT };
 enum CallBackType { START, ROOMLIST, ROOM, GAME };
-enum GameSyncType { FREEZE, METEOR, BARREL, SHOVEL, LEVELUP, TOWER };
+enum GameSyncType { FREEZE, METEOR, BARREL, SHOVEL, LEVELUP, TOWER, SPEED };
 extern map<RequestType, string> typeToStr;
 extern map<AuthState, string> authToStr;
 
@@ -22,6 +22,7 @@ struct GameSync {
     GameSyncType type;
     float x;
     float y;
+    int speed;
 };
 struct RequestData {
     RequestType type;
