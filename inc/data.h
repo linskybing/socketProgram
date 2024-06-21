@@ -11,7 +11,7 @@
 #define PLAYERS 2
 using namespace std;
 
-enum RequestType { LOGIN, REGISTER, LOBBY, CREATEROOM, JOINROOM, LEAVEROOM, DELETEROOM, LOADGAME, GAMESTART, GAMESYNC, REJECT, CLOSE_SOCKET };
+enum RequestType { LOGIN, REGISTER, LOBBY, CREATEROOM, JOINROOM, LEAVEROOM, DELETEROOM, LOADGAME, GAMESTART, GAMESYNC, SELECT, REJECT, CLOSE_SOCKET };
 enum AuthState { SUCCESS, ENTERGAME, FALE, EXIST, WAIT };
 enum CallBackType { START, ROOMLIST, ROOM, GAME };
 enum GameSyncType { FREEZE, METEOR, BARREL, SHOVEL, LEVELUP, TOWER };
@@ -28,12 +28,14 @@ struct RequestData {
     char uid[UID_LENGTH];
     char pwd[UID_LENGTH];
     int roomid = -1;
+    int mapId = 1;
     GameSync gameData;
 };
 
 struct ResponseData {
     int size = 0;
     int roomid = -1;
+    int mapId = 1;
     char uid[UID_LENGTH];
     RequestType type;
     AuthState auth;    
@@ -44,6 +46,7 @@ struct Room {
     int id;
     char roomName[ROOMNAME_LENGTH];
     char uid[PLAYERS][UID_LENGTH];
+    int mapId = 1;
     int players = 0;
 };
 

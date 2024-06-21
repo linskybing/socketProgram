@@ -127,6 +127,9 @@ void* GameSocket::handleClient(void* arg) {
             case GAMESTART:
                 GameSocket::quickSend(data);
                 break;
+            case SELECT:
+                GameSocket::handleMapSelect(data);
+                break;
             case LOADGAME:
                 GameSocket::handleGameStart(data);
                 break;
@@ -300,5 +303,18 @@ void GameSocket::quickSend(RequestData data) {
             std::cout << "find\n" << std::endl;
             return;
         }
+    }
+}
+
+void GameSocket::handleMapSelect(RequestData data) {
+    if (data.roomid == -1 || !gameLobby.rooms.count(data.roomid))
+        return;
+    ResponseData rdata;
+    strcpy(rdata.uid, data.uid);
+    rdata.roomid = data.roomid;
+    rdata.type = SELECT;
+    rdata.mapId = data.mapId;
+    for (auto it: GameSocket::clientSockets) {
+        send((it.first), (char*) &rdata, sizeof(ResponseData), 0);
     }
 }

@@ -38,6 +38,7 @@ namespace GameSocket {
     void handleGameSync(RequestData data);
     void handleGameStart(RequestData data);
     void quickSend(RequestData data);
+    void handleMapSelect(RequestData data);
     // clear function
     void disconnetion(int socket);
     void clear();
