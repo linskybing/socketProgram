@@ -40,6 +40,7 @@ namespace GameSocket {
     void quickSend(RequestData data);
     void handleMapSelect(RequestData data);
     void handleWriteBack(RequestData data);
+    void handleScoreReq(int);
     void checkAndAssgin(char*);
     // clear function
     void disconnetion(int socket);

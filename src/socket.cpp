@@ -1,6 +1,7 @@
 #include "../inc/socket.h"
 #include <iostream>
 #include <cstring>
+#include <algorithm>
 using namespace std;
 
 map<RequestType, string> typeToStr = {
@@ -16,6 +17,8 @@ map<RequestType, string> typeToStr = {
     {CLOSE_SOCKET, "CLOSE_SOCKET"},
     {LOADGAME, "LOADGAME"},
     {GAMESTART, "GAMESTART"},
+    {WRITEBACK, "WRITEBACK"}, 
+    {SCORE, "SOCKET"}
 };
 
 map<AuthState, string> authToStr = {
@@ -135,6 +138,9 @@ void* GameSocket::handleClient(void* arg) {
             case WRITEBACK:
                 GameSocket::handleWriteBack(data);
                 break;
+            case SCORE:
+                GameSocket::handleScoreReq(clientSocket);
+                break;
         }
         gameLobby.printLobby();
     }
@@ -144,6 +150,32 @@ void* GameSocket::handleClient(void* arg) {
     pthread_exit(nullptr);
     return nullptr;
 }
+
+void GameSocket::handleScoreReq(int clientSocket) {
+    ResponseData rdata;
+    rdata.type = SCORE;
+
+    send(clientSocket, (char*)&rdata, sizeof(rdata), 0);
+    
+    vector<std::pair<string, int> > arr;
+    for (const auto &item : DB::score) {
+        cout << item.first << " " << item.second << endl;
+        arr.emplace_back(item);
+    }
+    std::sort(arr.begin(), arr.end(), [](const auto &x, const auto &y) { return x.second > y.second; });
+
+    ScoreData data[arr.size()];
+    int size = arr.size();
+
+    send(clientSocket, (char*)&size, sizeof(int), 0);
+
+    for (int i = 0; i < size; i++) {
+        strcpy(data[i].uid, arr[i].first.c_str());
+        data[i].score = arr[i].second;
+        send(clientSocket, (char*)&data[i], sizeof(data[i]), 0);
+    }
+}
+
 void printDdata(RequestData data) {
     std::cout << "Money: " << data.udata.money << std::endl;
     std::cout << "Money: " << data.udata.score << std::endl;

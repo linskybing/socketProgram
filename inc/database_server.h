@@ -26,8 +26,9 @@ namespace DB {
         ifstream ifs;
         ifs.open("score/" + userName + ".txt");
         int s;
-        ifs >> s;
-        DB::score[userName] = s;
+        if (ifs >> s) {
+            DB::score[userName] = s;
+        }
         ifs.close();
     }
 
@@ -46,8 +47,10 @@ namespace DB {
         ifstream ifs;
         ifs.open("money/" + userName + ".txt");
         int t;
-        ifs >> t;
-        DB::money[userName] = t;
+        if (ifs >> t) {
+            DB::money[userName] = t;
+        }
+        
         ifs.close();
     }
 
@@ -124,5 +127,6 @@ namespace DB {
         writeUserMoney(userName);
         writeUserScore(userName);
     }
+
 };
 #endif
