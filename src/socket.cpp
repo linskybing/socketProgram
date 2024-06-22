@@ -144,16 +144,21 @@ void* GameSocket::handleClient(void* arg) {
     pthread_exit(nullptr);
     return nullptr;
 }
-
+void printDdata(RequestData data) {
+    std::cout << "Money: " << data.udata.money << std::endl;
+    std::cout << "Money: " << data.udata.score << std::endl;
+    std::cout << "Items: " << data.udata.items[0] << " " << data.udata.items[1] << " " << data.udata.items[2] << std::endl;
+}
 void GameSocket::handleWriteBack(RequestData data) {
     DB::score[data.uid] = data.udata.score;
     DB::money[data.uid] = data.udata.money;
     for (int i = 0; i < ITEMS; i++) {
-        std::cout << "write" << std::endl;
         DB::items[data.uid][i] = data.udata.items[i];
     }
-    //DB::writeUserDataById(data.uid);
+    DB::writeUserDataById(data.uid);
+    printDdata(data);
     ResponseData rdata;
+    rdata.type = WRITEBACK;
     rdata.udata = data.udata;
     send(GameSocket::clientSockets_r[data.uid], (char*) &(rdata), sizeof(rdata), 0);
 }
