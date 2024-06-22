@@ -198,6 +198,7 @@ void GameSocket::disconnetion(int socket) {
     clientSockets.erase(socket);
     if (gameLobby.userToRoom.count(userName))
         GameSocket::handleRoomLeave(userName.c_str(), gameLobby.userToRoom[userName]);
+    DB::writeUserDataById(userName);
 }
 
 void GameSocket::clear() {

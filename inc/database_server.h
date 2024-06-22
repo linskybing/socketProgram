@@ -118,5 +118,11 @@ namespace DB {
             writeUserScore(it.first);
         }
     }
+
+    void writeUserDataById(string userName) {
+        writeUserItem(userName);
+        writeUserMoney(userName);
+        writeUserScore(userName);
+    }
 };
 #endif
