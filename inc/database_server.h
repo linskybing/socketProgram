@@ -8,7 +8,7 @@ using namespace std;
 namespace DB {
     map<string, string> users;
     map<string, int> score;
-    map<string, vector<int> > items;
+    map<string, int[3]> items;
     map<string, int> money;
     string hash(string pwd) {
         unsigned long h = 5381;

@@ -142,6 +142,22 @@ void* GameSocket::handleClient(void* arg) {
     return nullptr;
 }
 
+void GameSocket::checkAndAssgin(char uid[UID_LENGTH]) {
+    if (!DB::score.count(uid)) {
+        DB::score[uid] = 0;
+        DB::writeUserScore(uid);
+    }
+
+    if (!DB::items.count(uid)) {
+        DB::items[uid] = {0, 0, 0};
+        DB::writeUserItem(uid);
+    }
+
+    if (!DB::money.count(uid)) {
+        DB::money[uid] = 0;
+        DB::writeUserScore(uid);
+    }
+}
 
 void GameSocket::handleLobbyEvent(int clientSocket, char uid[UID_LENGTH]) {
 
@@ -159,6 +175,13 @@ void GameSocket::handleLobbyEvent(int clientSocket, char uid[UID_LENGTH]) {
     for (auto it: gameLobby.rooms) {
         send(clientSocket, (char*) &(it.second), sizeof(Room), 0);
     }
+
+    checkAndAssgin(uid);
+    UserData udata;
+    udata.money = DB::money[uid];
+    udata.score = DB::score[uid];
+    udata.items = DB::items[uid];
+    send(clientSocket, (char*) &udata, sizeof(UserData), 0);
 }
 
 void GameSocket::pushSocket(int p, string uid) {
