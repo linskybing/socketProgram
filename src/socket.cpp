@@ -149,7 +149,7 @@ void GameSocket::checkAndAssgin(char uid[UID_LENGTH]) {
     }
 
     if (!DB::items.count(uid)) {
-        DB::items[uid] = {0, 0, 0};
+        //DB::items[uid] = {0, 0, 0};
         DB::writeUserItem(uid);
     }
 
@@ -180,7 +180,9 @@ void GameSocket::handleLobbyEvent(int clientSocket, char uid[UID_LENGTH]) {
     UserData udata;
     udata.money = DB::money[uid];
     udata.score = DB::score[uid];
-    udata.items = DB::items[uid];
+    for (int i = 0; i < ITEMS; i++) {
+        udata.items[i] = DB::items[uid][i];
+    }
     send(clientSocket, (char*) &udata, sizeof(UserData), 0);
 }
 

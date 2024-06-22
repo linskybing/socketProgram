@@ -8,7 +8,7 @@ using namespace std;
 namespace DB {
     map<string, string> users;
     map<string, int> score;
-    map<string, int[3]> items;
+    map<string, int[ITEMS]> items;
     map<string, int> money;
     string hash(string pwd) {
         unsigned long h = 5381;
@@ -35,9 +35,9 @@ namespace DB {
         ifstream ifs;
         ifs.open("item/" + userName + ".txt");
         int t;
-        items[userName] = vector<int>(3);
+        int i = 0;
         while (ifs >> t) {
-            items[userName].push_back(t);
+            items[userName][i++] = t;
         }
         ifs.close();
     }

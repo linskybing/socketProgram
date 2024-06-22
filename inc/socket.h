@@ -7,7 +7,7 @@
 #include <pthread.h>
 #include "data.h"
 #include "database_server.h"
-#define PORT 7658
+#define PORT 7650
 
 #define PARALLEL 5
 
