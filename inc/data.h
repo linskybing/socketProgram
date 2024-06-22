@@ -12,12 +12,18 @@
 #define ITEMS 3
 using namespace std;
 
-enum RequestType { LOGIN, REGISTER, LOBBY, CREATEROOM, JOINROOM, LEAVEROOM, DELETEROOM, LOADGAME, GAMESTART, GAMESYNC, SELECT, REJECT, CLOSE_SOCKET };
+enum RequestType { LOGIN, REGISTER, LOBBY, CREATEROOM, JOINROOM, LEAVEROOM, DELETEROOM, LOADGAME, GAMESTART, GAMESYNC, SELECT, REJECT, CLOSE_SOCKET, WRITEBACK };
 enum AuthState { SUCCESS, ENTERGAME, FALE, EXIST, WAIT };
 enum CallBackType { START, ROOMLIST, ROOM, GAME };
 enum GameSyncType { FREEZE, METEOR, BARREL, SHOVEL, LEVELUP, TOWER, SPEED };
 extern map<RequestType, string> typeToStr;
 extern map<AuthState, string> authToStr;
+
+struct UserData {
+    int money;
+    int score;
+    int items[ITEMS];
+};
 
 struct GameSync {
     GameSyncType type;
@@ -32,6 +38,7 @@ struct RequestData {
     int roomid = -1;
     int mapId = 1;
     GameSync gameData;
+    UserData udata;
 };
 
 struct ResponseData {
@@ -42,6 +49,7 @@ struct ResponseData {
     RequestType type;
     AuthState auth;    
     GameSync gameData;
+    UserData udata;
 };
 
 struct Room {
@@ -52,11 +60,6 @@ struct Room {
     int players = 0;
 };
 
-struct UserData {
-    int money;
-    int score;
-    int items[ITEMS];
-};
 
 struct Lobby {
     int size = 0;

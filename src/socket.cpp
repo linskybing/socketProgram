@@ -132,6 +132,9 @@ void* GameSocket::handleClient(void* arg) {
             case GAMESYNC: 
                 GameSocket::handleGameSync(data);
                 break;
+            case WRITEBACK:
+                GameSocket::handleWriteBack(data);
+                break;
         }
         gameLobby.printLobby();
     }
@@ -140,6 +143,19 @@ void* GameSocket::handleClient(void* arg) {
 
     pthread_exit(nullptr);
     return nullptr;
+}
+
+void GameSocket::handleWriteBack(RequestData data) {
+    DB::score[data.uid] = data.udata.score;
+    DB::money[data.uid] = data.udata.money;
+    for (int i = 0; i < ITEMS; i++) {
+        std::cout << "write" << std::endl;
+        DB::items[data.uid][i] = data.udata.items[i];
+    }
+    //DB::writeUserDataById(data.uid);
+    ResponseData rdata;
+    rdata.udata = data.udata;
+    send(GameSocket::clientSockets_r[data.uid], (char*) &(rdata), sizeof(rdata), 0);
 }
 
 void GameSocket::checkAndAssgin(char uid[UID_LENGTH]) {
