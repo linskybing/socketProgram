@@ -15,7 +15,7 @@ using namespace std;
 enum RequestType { LOGIN, REGISTER, LOBBY, CREATEROOM, JOINROOM, LEAVEROOM, DELETEROOM, LOADGAME, GAMESTART, GAMESYNC, SELECT, REJECT, CLOSE_SOCKET, WRITEBACK, SCORE};
 enum AuthState { SUCCESS, ENTERGAME, STARTSYNC, FALE, EXIST, WAIT };
 enum CallBackType { START, ROOM, GAME, SHOP };
-enum GameSyncType { FREEZE, METEOR, BARREL, SHOVEL, LEVELUP, TOWER, SPEED };
+enum GameSyncType { FREEZE, METEOR, BARREL, SHOVEL, LEVELUP, TOWER, SPEED, WIN, LOSE };
 extern map<RequestType, string> typeToStr;
 extern map<AuthState, string> authToStr;
 
@@ -68,6 +68,7 @@ struct Room {
 
 struct Lobby {
     int size = 0;
+    int ids = 0;
     std::map<int, Room> rooms;
     std::map<std::string, int> userToRoom;
     void push(int id, Room room) {

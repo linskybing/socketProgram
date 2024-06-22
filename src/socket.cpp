@@ -127,6 +127,7 @@ void* GameSocket::handleClient(void* arg) {
                 GameSocket::quickSend(data);
                 break;
             case SELECT:
+                std::cout << data.mapId << std::endl;
                 GameSocket::handleMapSelect(data);
                 break;
             case LOADGAME:
@@ -224,9 +225,12 @@ void GameSocket::handleLobbyEvent(int clientSocket, char uid[UID_LENGTH]) {
     data.type = LOBBY;
     data.size = gameLobby.size;
     send(clientSocket, (char*) &data, sizeof(ResponseData), 0);
-    
+    cout << data.size << endl;
     for (auto it: gameLobby.rooms) {
-        send(clientSocket, (char*) &(it.second), sizeof(Room), 0);
+        Room roomData;
+        roomData = it.second;
+        cout << roomData.players << endl;
+        send(clientSocket, (char*) &(roomData), sizeof(roomData), 0);
     }
 
     checkAndAssgin(uid);
@@ -262,10 +266,7 @@ void GameSocket::clear() {
 void GameSocket::handleRoomCreate(char* uid, char* roomName) {
 
     Room nRoom;
-    if (gameLobby.size)
-        nRoom.id = (gameLobby.rooms.rbegin()->first) + 1;
-    else
-        nRoom.id = 0;
+    nRoom.id = gameLobby.ids++;
     strcpy(nRoom.roomName, roomName);
     strcpy(nRoom.uid[nRoom.players++], uid);
     gameLobby.push(nRoom.id, nRoom);
@@ -310,7 +311,7 @@ void GameSocket::handleRoomLeave(const char* uid, int id) {
     if (id == -1) return;
     gameLobby.userToRoom.erase(string(uid));
     gameLobby.rooms[id].players--;
-    if (!gameLobby.rooms[id].players) {
+    if (gameLobby.rooms[id].players <= 0) {
         GameSocket::handleRoomDelete(id);
         return;
     }
@@ -381,14 +382,12 @@ void GameSocket::quickSend(RequestData data) {
 }
 
 void GameSocket::handleMapSelect(RequestData data) {
-    if (data.roomid == -1 || !gameLobby.rooms.count(data.roomid))
-        return;
     ResponseData rdata;
     strcpy(rdata.uid, data.uid);
     rdata.roomid = data.roomid;
     rdata.type = SELECT;
     rdata.mapId = data.mapId;
-    std::cout << data.mapId << std::endl;
+    gameLobby.rooms[data.roomid].mapId = data.mapId;
     for (auto it: GameSocket::clientSockets) {
         send((it.first), (char*) &rdata, sizeof(ResponseData), 0);
     }
