@@ -35,7 +35,6 @@ struct GameSync {
     float x;
     float y;
     int speed;
-    int id;
 };
 struct RequestData {
     RequestType type;
