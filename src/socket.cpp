@@ -17,8 +17,9 @@ map<RequestType, string> typeToStr = {
     {CLOSE_SOCKET, "CLOSE_SOCKET"},
     {LOADGAME, "LOADGAME"},
     {GAMESTART, "GAMESTART"},
-    {WRITEBACK, "WRITEBACK"}, 
-    {SCORE, "SOCKET"}
+    {SELECT, "SELECT"},
+    {WRITEBACK, "WRITEBACK"},
+    {SCORE, "SCORE"}
 };
 
 map<AuthState, string> authToStr = {
@@ -225,11 +226,11 @@ void GameSocket::handleLobbyEvent(int clientSocket, char uid[UID_LENGTH]) {
     data.type = LOBBY;
     data.size = gameLobby.size;
     send(clientSocket, (char*) &data, sizeof(ResponseData), 0);
-    cout << data.size << endl;
+    cout << "rooms: " << data.size << endl;
     for (auto it: gameLobby.rooms) {
         Room roomData;
         roomData = it.second;
-        cout << roomData.players << endl;
+        cout << "players: " << roomData.players << endl;
         send(clientSocket, (char*) &(roomData), sizeof(roomData), 0);
     }
 

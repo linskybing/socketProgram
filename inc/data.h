@@ -61,10 +61,9 @@ struct Room {
     int id;
     char roomName[ROOMNAME_LENGTH];
     char uid[PLAYERS][UID_LENGTH];
-    int mapId = 1;
     int players = 0;
+    int mapId = 1;
 };
-
 
 struct Lobby {
     int size = 0;

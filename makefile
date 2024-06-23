@@ -1,5 +1,5 @@
 
 main: server.cpp src/socket.cpp
-	g++ -o server server.cpp -std=c++17
+	g++ -O3 -o server server.cpp -std=c++17
 clean: 
 	rm server
